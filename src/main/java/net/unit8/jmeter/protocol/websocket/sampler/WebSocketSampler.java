@@ -46,15 +46,15 @@ public class WebSocketSampler extends AbstractSampler implements TestStateListen
                     "net.unit8.jmeter.protocol.websocket.control.gui.WebSocketSamplerGui",
                     "org.apache.jmeter.config.gui.SimpleConfigGui"}));
 
-    private static final String ARG_VAL_SEP = "="; // $NON-NLS-1$
-    private static final String QRY_SEP = "&"; // $NON-NLS-1$
-    private static final String QRY_PFX = "?"; // $NON-NLS-1$
+    private static final String ARG_VAL_SEP = "=";
+    private static final String QRY_SEP = "&";
+    private static final String QRY_PFX = "?";
 
-    private static final String WS_PREFIX = "ws://"; // $NON-NLS-1$
-    private static final String WSS_PREFIX = "wss://"; // $NON-NLS-1$
+    private static final String WS_PREFIX = "ws://";
+    private static final String WSS_PREFIX = "wss://";
     private static final String DEFAULT_PROTOCOL = "ws";
     private static final int UNSPECIFIED_PORT = 0;
-    private static final String UNSPECIFIED_PORT_AS_STRING = "0"; // $NON-NLS-1$
+    private static final String UNSPECIFIED_PORT_AS_STRING = "0";
     private static final int URL_UNSPECIFIED_PORT = -1;
 
 
