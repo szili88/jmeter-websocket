@@ -9,11 +9,6 @@
     <version>0.1.0-SNAPSHOT</version>
     <name>ApacheJmeter_websocket</name>
 
-    <properties>
-        <jmeterVersion>2.9</jmeterVersion>
-        <jettyVersion>8.1.9.v20130131</jettyVersion>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -40,26 +35,25 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter</artifactId>
-            <version>${jmeterVersion}</version>
+            <artifactId>ApacheJMeter_core</artifactId>
+            <version>2.13</version>
             <scope>provided</scope>
+            <!-- workaround for https://bz.apache.org/bugzilla/show_bug.cgi?id=57734 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-math3</groupId>
+                    <artifactId>commons-math3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-pool2</groupId>
+                    <artifactId>commons-pool2</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_http</artifactId>
-            <version>${jmeterVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_functions</artifactId>
-            <version>${jmeterVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-websocket</artifactId>
-            <version>${jettyVersion}</version>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-client</artifactId>
+            <version>9.2.10.v20150310</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -1,15 +1,15 @@
 package net.unit8.jmeter.protocol.websocket.control.gui;
 
 import net.unit8.jmeter.protocol.websocket.sampler.WebSocketSampler;
-import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.gui.util.HorizontalPanel;
+import org.apache.jmeter.gui.util.JSyntaxTextArea;
+import org.apache.jmeter.gui.util.JTextScrollPane;
 import org.apache.jmeter.gui.util.VerticalPanel;
-import org.apache.jmeter.protocol.http.gui.HTTPArgumentsPanel;
-import org.apache.jmeter.protocol.http.util.HTTPArgument;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
-import org.apache.jmeter.testelement.property.TestElementProperty;
 import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,20 +17,17 @@ import java.awt.*;
 /**
  * GUI for WebSocketSampler
  *
- * @author kawasima
+ * @author szili88
  */
 public class WebSocketSamplerGui extends AbstractSamplerGui {
-
+    private static final Logger LOGGER = LoggingManager.getLoggerForClass();
     private JTextField domain;
-    private JTextField port;
-    private JTextField protocol;
     private JTextField contentEncoding;
-    private JTextField path;
-    private JTextArea sendMessage;
-    private JTextArea recvMessage;
-    private HTTPArgumentsPanel argsPanel;
+    private JSyntaxTextArea sendMessage;
+    private JSyntaxTextArea recvMessage;
 
     public WebSocketSamplerGui() {
+        LOGGER.warn("Initializing WebSocketSamplerGui...");
         init();
     }
 
@@ -43,129 +40,77 @@ public class WebSocketSamplerGui extends AbstractSamplerGui {
     public String getStaticLabel() {
         return "Websocket Sampler";
     }
+
     @Override
     public void configure(TestElement element) {
         super.configure(element);
-        domain.setText(element.getPropertyAsString(WebSocketSampler.DOMAIN));
-        port.setText(element.getPropertyAsString(WebSocketSampler.PORT));
-        protocol.setText(element.getPropertyAsString(WebSocketSampler.PROTOCOL));
-        path.setText(element.getPropertyAsString(WebSocketSampler.PATH));
+        domain.setText(element.getPropertyAsString(WebSocketSampler.SERVER_URI));
         contentEncoding.setText(element.getPropertyAsString(WebSocketSampler.CONTENT_ENCODING));
-
-        Arguments arguments = (Arguments) element.getProperty(WebSocketSampler.ARGUMENTS).getObjectValue();
-        argsPanel.configure(arguments);
-
         sendMessage.setText(element.getPropertyAsString(WebSocketSampler.SEND_MESSAGE));
-        recvMessage.setText(element.getPropertyAsString(WebSocketSampler.RECV_MESSAGE));
+        recvMessage.setText(element.getPropertyAsString(WebSocketSampler.RECEIVE_MESSAGE));
     }
 
     @Override
     public TestElement createTestElement() {
         WebSocketSampler element = new WebSocketSampler();
-
         element.setName(getName());
-        element.setProperty(TestElement.GUI_CLASS, this.getClass().getName());
-        element.setProperty(TestElement.TEST_CLASS, element.getClass().getName());
-
-        modifyTestElement(element);
+        element.setProperty(WebSocketSampler.SERVER_URI, "ws://");
+        element.setProperty(WebSocketSampler.CONTENT_ENCODING, "utf-8");
+        configureTestElement(element);
         return element;
     }
 
     @Override
     public void modifyTestElement(TestElement element) {
-        configureTestElement(element);
-        element.setProperty(WebSocketSampler.DOMAIN, domain.getText());
-        element.setProperty(WebSocketSampler.PATH, path.getText());
-        element.setProperty(WebSocketSampler.PORT, port.getText());
-        element.setProperty(WebSocketSampler.PROTOCOL, protocol.getText());
+        element.setProperty(WebSocketSampler.SERVER_URI, domain.getText());
         element.setProperty(WebSocketSampler.CONTENT_ENCODING, contentEncoding.getText());
-
-        Arguments args = (Arguments) argsPanel.createTestElement();
-        HTTPArgument.convertArgumentsToHTTP(args);
-        element.setProperty(new TestElementProperty(WebSocketSampler.ARGUMENTS, args));
-
         element.setProperty(WebSocketSampler.SEND_MESSAGE, sendMessage.getText());
-        element.setProperty(WebSocketSampler.RECV_MESSAGE, recvMessage.getText());
+        element.setProperty(WebSocketSampler.RECEIVE_MESSAGE, recvMessage.getText());
+        configureTestElement(element);
     }
 
     private JPanel getDomainPanel() {
         domain = new JTextField(20);
-
         JLabel label = new JLabel(JMeterUtils.getResString("web_server_domain"));
         label.setLabelFor(domain);
-
         JPanel panel = new JPanel(new BorderLayout(5, 0));
         panel.add(label, BorderLayout.WEST);
         panel.add(domain, BorderLayout.CENTER);
         return panel;
     }
 
-    private JPanel getPortPanel() {
-        port = new JTextField(4);
-
-        JLabel label = new JLabel(JMeterUtils.getResString("web_server_port"));
-        label.setLabelFor(port);
-
-        JPanel panel = new JPanel(new BorderLayout(5, 0));
-        panel.add(label, BorderLayout.WEST);
-        panel.add(port, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    protected Component getProtocolAndPathPanel() {
-        // PATH
-        path = new JTextField(15);
-        JLabel pathLabel = new JLabel(JMeterUtils.getResString("path"));
-        pathLabel.setLabelFor(path);
-
-        // PROTOCOL
-        protocol = new JTextField(4);
-        JLabel protocolLabel = new JLabel(JMeterUtils.getResString("protocol"));
-        protocolLabel.setLabelFor(protocol);
-
-        // CONTENT_ENCODING
+    protected Component getContentEncodingPanel() {
         contentEncoding = new JTextField(10);
         JLabel contentEncodingLabel = new JLabel(JMeterUtils.getResString("content_encoding"));
         contentEncodingLabel.setLabelFor(contentEncoding);
-
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.add(pathLabel);
-        panel.add(path);
         panel.add(Box.createHorizontalStrut(5));
-
-        panel.add(protocolLabel);
-        panel.add(protocol);
         panel.add(Box.createHorizontalStrut(5));
-
         panel.add(contentEncodingLabel);
         panel.add(contentEncoding);
         panel.setMinimumSize(panel.getPreferredSize());
-
         return panel;
     }
 
     private JPanel getSendMessagePanel() {
         JLabel sendMessageLabel = new JLabel("Sent Message");
-        sendMessage = new JTextArea(3, 0);
+        sendMessage = new JSyntaxTextArea(5, 20);
         sendMessage.setLineWrap(true);
         sendMessageLabel.setLabelFor(sendMessage);
-
         JPanel sendMessagePanel = new JPanel(new BorderLayout(5, 0));
         sendMessagePanel.add(sendMessageLabel, BorderLayout.WEST);
-        sendMessagePanel.add(sendMessage, BorderLayout.CENTER);
+        sendMessagePanel.add(new JTextScrollPane(sendMessage), BorderLayout.CENTER);
         return sendMessagePanel;
     }
 
     private JPanel getRecvMessagePanel() {
         JLabel recvMessageLabel = new JLabel("Received Message");
-        recvMessage = new JTextArea(3, 0);
+        recvMessage = new JSyntaxTextArea(5, 20);
         recvMessage.setLineWrap(true);
         recvMessageLabel.setLabelFor(recvMessage);
-
         JPanel recvMessagePanel = new JPanel(new BorderLayout(5, 0));
         recvMessagePanel.add(recvMessageLabel, BorderLayout.WEST);
-        recvMessagePanel.add(recvMessage, BorderLayout.CENTER);
+        recvMessagePanel.add(new JTextScrollPane(recvMessage), BorderLayout.CENTER);
         return recvMessagePanel;
     }
 
@@ -181,16 +126,13 @@ public class WebSocketSamplerGui extends AbstractSamplerGui {
         JPanel serverPanel = new JPanel();
         serverPanel.setLayout(new BoxLayout(serverPanel, BoxLayout.X_AXIS));
         serverPanel.add(getDomainPanel());
-        serverPanel.add(getPortPanel());
 
         webRequestPanel.add(serverPanel, BorderLayout.NORTH);
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
-        northPanel.add(getProtocolAndPathPanel());
+        northPanel.add(getContentEncodingPanel());
 
         webRequestPanel.add(northPanel, BorderLayout.CENTER);
-        argsPanel = new HTTPArgumentsPanel();
-        webRequestPanel.add(argsPanel, BorderLayout.SOUTH);
 
         mainPanel.add(webRequestPanel);
         mainPanel.add(getSendMessagePanel());
