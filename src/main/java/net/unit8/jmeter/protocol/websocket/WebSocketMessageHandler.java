@@ -1,5 +1,7 @@
 package net.unit8.jmeter.protocol.websocket;
 
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -8,25 +10,32 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import java.io.IOException;
 
+/**
+ * WebSocketMessageHandler is responsible for sending and receiving messages over WebSocket.
+ *
+ * @author szili88
+ */
 @WebSocket
 public class WebSocketMessageHandler {
+    private static final Logger LOGGER = LoggingManager.getLoggerForClass();
+
     private Session session;
     private String responseMessage;
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
-        System.out.printf("Connection closed: %d - %s%n", statusCode, reason);
+        LOGGER.debug("Connection closed with status code " + statusCode + ", reason " + reason);
     }
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
         this.session = session;
-        System.out.printf("Got connect: %s%n", session);
+        LOGGER.debug("Successfully connected to " + session);
     }
 
     @OnWebSocketMessage
     public synchronized void onMessage(String message) {
-        System.out.println("Got msg: " + message);
+        LOGGER.debug("Received message " + message);
         responseMessage = message;
         notify();
     }

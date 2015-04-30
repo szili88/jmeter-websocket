@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.unit8.jmeter</groupId>
-    <artifactId>ApacheJmeter_websocket</artifactId>
+    <artifactId>ApacheJMeter_websocket</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <name>ApacheJmeter_websocket</name>
+    <name>ApacheJMeter_websocket</name>
 
     <build>
         <plugins>
